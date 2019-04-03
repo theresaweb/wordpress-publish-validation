@@ -1,4 +1,10 @@
-# Simple Gutenberg Boilerplate for plugin development
+# Plugin to require fields on posts and/or pages
+- Option to validate or not on drafts
+- Works with Gutenberg and classic editor
+- Simple Gutenberg Boilerplate used to get started
+
+
+
 
 ## What is included in this boilerplate ?
 
