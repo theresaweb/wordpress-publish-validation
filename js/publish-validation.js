@@ -63,7 +63,7 @@ console.log(PV_options);
             console.log( 'The new title is :' + newTitle );
             if (newTitle === '') {
                 lockPost();
-                wp.data.dispatch( 'core/notices' ).createErrorNotice( PV_options.rf_title_error, { id: 'LOCK_NOTICE_TITLE',isDismissible: true} ) ;
+                wp.data.dispatch( 'core/notices' ).createErrorNotice( PV_options.PV_title_error_msg, { id: 'LOCK_NOTICE_TITLE',isDismissible: true} ) ;
                 // show message or open sidebar??
             } else {
                 unlockPost();
