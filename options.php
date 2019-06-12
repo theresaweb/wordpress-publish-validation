@@ -16,7 +16,7 @@ function publish_validation_options_page() {
         </form>
     </div>
 <?php
-    }
+}
 /*
 $post_options
 PV_for_post_enabled'
@@ -44,9 +44,11 @@ function publish_validation_admin_init(){
     register_setting( 'publish_validation_options', 'PV_options', 'plugin_options_validate' );
     /** post section */
     add_settings_section('post_settings_section', '<div alt="f109" class="dashicons-before dashicons-admin-post">Post Options</div>', 'post_settings_section_output', 'publish_validation');
-/*     add_settings_field('PV_for_post_enabled', '<div alt="f109" class="dashicons-before dashicons-admin-post">Required Fields on Posts</div>', 'PV_for_post_chkbx', 'publish_validation','post_settings_section',$options); */
+
     add_settings_field('PV_for_post_draft', '', 'PV_options_render_chkbx', 'publish_validation','post_settings_section',[$options,'PV_for_post_draft','Require Validation on Post Drafts']);
+
     add_settings_field('PV_title_req_post', '', 'PV_options_render_chkbx', 'publish_validation','post_settings_section',[$options,'PV_title_req_post','Require Title on Posts']);
+
     add_settings_field('PV_excerpt_req_post', '', 'PV_options_render_chkbx', 'publish_validation','post_settings_section',[$options,'PV_excerpt_req_post','Require Excerpt on Posts']);
     add_settings_field('PV_category_req_post', '', 'PV_options_render_chkbx', 'publish_validation','post_settings_section',[$options,'PV_category_req_post','Require Category on Posts']);
     add_settings_field('PV_tag_req_post', '', 'PV_options_render_chkbx', 'publish_validation','post_settings_section',[$options,'PV_tag_req_post','Require tag on Posts']);
@@ -54,11 +56,18 @@ function publish_validation_admin_init(){
 
     /** page section */
     add_settings_section('page_settings_section', '<div alt="f105" class="dashicons-before dashicons-admin-page">Page Options</div>', 'page_settings_section_output', 'publish_validation');
-/*     add_settings_field('PV_for_page_enabled', '<div alt="f105" class="dashicons-before dashicons-admin-page">Required Fields on Pages</div>', 'PV_for_page_chkbx', 'publish_validation','page_settings_section',$options); */
+
     add_settings_field('PV_for_page_draft', '', 'PV_options_render_chkbx', 'publish_validation','page_settings_section',[$options,'PV_for_page_draft','Require Validation on Page Drafts']);
     add_settings_field('PV_title_req_page', '', 'PV_options_render_chkbx', 'publish_validation','page_settings_section',[$options,'PV_title_req_page','Require Title on Pages']);
     add_settings_field('PV_featured_image_req_page', '', 'PV_options_render_chkbx', 'publish_validation','page_settings_section',[$options,'PV_featured_image_req_page','Require Featured Image on Pages']);
 
+    /** error messages */
+    add_settings_section('errormsg_settings_section', '<div alt="f105" class="dashicons-before dashicons-warning">Error Messages</div>', 'errormsg_settings_section_output', 'publish_validation');
+    add_settings_field('PV_title_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_title_error_msg','Missing Title Error Msg']);  
+    add_settings_field('PV_excerpt_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_excerpt_error_msg','Missing Excerpt Error Msg']); 
+    add_settings_field('PV_category_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_category_error_msg','Missing Category Error Msg']); 
+    add_settings_field('PV_tag_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_tag_error_msg','Missing Tag Error Msg']); 
+    add_settings_field('PV_featured_img_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_featured_image_error_msg','Missing Featured Image Error Msg']); 
 }
 
 add_action('admin_init', 'publish_validation_admin_init');
@@ -69,20 +78,19 @@ function post_settings_section_output() {
 function page_settings_section_output() {
     echo '<p>Choose required fields for pages</p>';
 }
-/* function PV_for_post_chkbx($options) {
-    $checked = isset($options['PV_for_post_enabled']) ? 'checked' : '';
-    echo "<input type='checkbox' id='PV_for_post_enabled' name='PV_options[PV_for_post_enabled]' $checked >";
-    echo "<label for='PV_for_post_enabled'>Validate for Posts</label>";
+function errormsg_settings_section_output() {
+    echo '<p>Provide error messages</p>';
 }
-function PV_for_page_chkbx($options) {
-    $checked = isset($options['PV_for_page_enabled']) ? 'checked' : '';
-    echo "<input type='checkbox' id='PV_for_page_enabled' name='PV_options[PV_for_page_enabled]' $checked >";
-    echo "<label for='PV_for_page_enabled'>Validate for Pages</label>";
-} */
 function PV_options_render_chkbx($args) {
     $checked = isset($args[0][$args[1]]) ? 'checked' : '';
+    
     echo "<input type='checkbox' id='$args[1]' name='PV_options[$args[1]]' $checked >";
     echo "<label for='$args[1]'>$args[2]</label>";
+}
+function PV_options_render_input($args) {
+    $errormsg = isset($args[0][$args[1]]) ? $args[0][$args[1]] : '';
+    echo "<label for='$args[1]'>$args[2]</label>";
+    echo "<p><input type='text' size='40' id='$args[1]' name='PV_options[$args[1]]' value='$errormsg' ></p>";
 }
 function plugin_options_validate($input) {
     //validate input for error msgs here
