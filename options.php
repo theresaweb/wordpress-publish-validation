@@ -17,28 +17,7 @@ function publish_validation_options_page() {
     </div>
 <?php
 }
-/*
-$post_options
-PV_for_post_enabled'
-    PV_title_req_post
-	PV_excerpt_req_post
-	PV_category_req_post
-	PV_tag_req_post
-	PV_featured_image_req_post
 
-                
-
- 		'PV_for_page_enabled'					=> '',
-		'PV_for_draft_enabled' 				=> '',
-		'PV_featured_img_req_page' 		=> '',
-		'PV_title_req_page' 					=> '',
-
-		'PV_title_error_msg' 					=> 'Title is required',
-		'PV_excerpt_error_msg' 				=> 'Excerpt is required',
-		'PV_category_error_msg' 			=> 'Categories are required',
-		'PV_tag_error_msg' 						=> 'Please set less one tag',
-        'PV_featured_img_error_msg' 	=> 'Post Thumbnail is required'
-        */
 function publish_validation_admin_init(){
     $options = get_option('PV_options');
     register_setting( 'publish_validation_options', 'PV_options', 'plugin_options_validate' );
@@ -93,7 +72,7 @@ function PV_options_render_input($args) {
     echo "<p><input type='text' size='40' id='$args[1]' name='PV_options[$args[1]]' value='$errormsg' ></p>";
 }
 function plugin_options_validate($input) {
-    //validate input for error msgs here
+    //validate and sanitize input for error msgs here
     return $input;
 }
 ?>

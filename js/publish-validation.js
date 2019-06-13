@@ -14,49 +14,70 @@ const featuredImgIsReqOnPage = PV_options.PV_featured_img_req_page==='on' ? true
 const titleIsReqOnPage = PV_options.PV_title_req_page==='on' ? true : false;
 
 //PV_options passed from plugin php
-const postsHaveRequiredFields = postTagIsRequired || postCatIsRequired || postExcerptIsRequired || postFeaturedImgIsRequired || postTagIsRequired;
+const postsHaveRequiredFields = postTitleIsRequired || postCatIsRequired || postExcerptIsRequired || postFeaturedImgIsRequired || postTagIsRequired;
 const pagesHaveRequiredFields = featuredImgIsReqOnPage || titleIsReqOnPage;
 const postDraftShouldHonorRequiredFields = PV_options.PV_for_post_draft==='on' ? true : false;
 const pageDraftShouldHonorRequiredFields = PV_options.PV_for_page_draft==='on' ? true : false;
 console.log(PV_options);
-const postType = wp.data.select( 'core/editor' ).getEditedPostAttribute('type');
-console.log("post type is "+postType);
-var postStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
-console.log("poststatus is "+postStatus);
+let title = String(wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' ));
+let categories = String(wp.data.select('core/editor').getEditedPostAttribute('categories'));
+let excerpt = String(wp.data.select('core/editor').getEditedPostAttribute('excerpt'));
+console.log(typeof(excerpt));
+console.log("excerpt "+excerpt);
+let count = 0;
+wp.data.subscribe( function() {
+    let postType = wp.data.select( 'core/editor' ).getEditedPostAttribute('type');
+    let postStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
 
-if ((postStatus === 'draft' && postType === 'post' && !postDraftShouldHonorRequiredFields) || (postStatus === 'draft' && postType === 'page' && !pageDraftShouldHonorRequiredFields) || (postType === 'post' && !postsHaveRequiredFields) || (postType === 'page' && !pagesHaveRequiredFields)) {
-    // don't bother in these cases
-} else {
-    var count = 0;
-    var checkTitle = postTitleIsRequired || titleIsReqOnPage;
-    var title = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' );
-    var categories = wp.data.select('core/editor').getEditedPostAttribute('categories');
-    var excerpt = wp.data.select('core/editor').getEditedPostAttribute('excerpt');
-    lockPost();
-    //also featured imnage
-    wp.data.subscribe( function() {
-        if (checkTitle) {
-            checkForTitle();
+    if ((postStatus === 'draft' && postType === 'post' && !postDraftShouldHonorRequiredFields) || (postStatus === 'draft' && postType === 'page' && !pageDraftShouldHonorRequiredFields) || (postType === 'post' && !postsHaveRequiredFields) || (postType === 'page' && !pagesHaveRequiredFields)) {
+        // don't bother in these cases
+        console.log("don't bother");
+    } else {
+        //title
+        const checkTitle = postTitleIsRequired || titleIsReqOnPage;
+        let newTitle = String(wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' ));
+        var titleChanged = newTitle !== title;
+        title = newTitle;
+        if (checkTitle && titleChanged) {
+            showHideNotification(title, 'LOCK_NOTICE_TITLE', PV_options.PV_title_error_msg);
         }
-        console.log('tick'+count);
-        count ++;
-    });
-}
-function checkForTitle() {
-    var content = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'content' );
-    var newTitle = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' );
-    var titleChanged = newTitle !== title;
-    title = newTitle ? newTitle : '';
-    console.log("titlechnged "+titleChanged);
-    if ( titleChanged ) {
-        if (newTitle === '') {
-            lockPost();
-            wp.data.dispatch( 'core/notices' ).createErrorNotice( PV_options.PV_title_error_msg, { id: 'LOCK_NOTICE_TITLE',isDismissible: true} );
-        } else {
-            unlockPost();
-            wp.data.dispatch( 'core/notices' ).removeNotice('LOCK_NOTICE_TITLE');
-            console.log("title is set");
-        }
+        //category
+        const checkCats = postCatIsRequired;
+        let newCats = String(wp.data.select( 'core/editor' ).getEditedPostAttribute( 'categories' ));
+        console.log("newCats"+newCats);
+        var catsChanged = newCats !== categories;
+        console.log("catsChanged "+catsChanged);
+        console.log("checkCats "+checkCats);
+        categories = newCats;
+        if (checkCats && catsChanged) {
+            console.log("cats----------------------------here");
+            showHideNotification(categories, 'LOCK_NOTICE_CATEGORY', PV_options.PV_category_error_msg);
+        }        
+        //excerpt
+        const checkExcerpt = postExcerptIsRequired;
+        let newExcerpt = String(wp.data.select( 'core/editor' ).getEditedPostAttribute( 'excerpt' ));
+        console.log("newExcerpt"+newExcerpt);
+        let excerptChanged = newExcerpt !== excerpt;
+        console.log("excerptChanged "+excerptChanged);
+        console.log("chekckexcerpt "+checkExcerpt);
+        excerpt = newExcerpt;
+        if (checkExcerpt && excerptChanged) {
+            console.log("----------------------------here");
+            showHideNotification(excerpt, 'LOCK_NOTICE_EXCERPT', PV_options.PV_excerpt_error_msg);
+        }         
+    }
+    console.log('tick'+count);
+    count ++;
+});
+function showHideNotification(param, notificationId, errormsg) {
+    if (param === '') {
+        lockPost();
+        wp.data.dispatch( 'core/notices' ).createErrorNotice( errormsg, { id: notificationId,isDismissible: true} );
+        return;
+    } else {
+        unlockPost();
+        wp.data.dispatch( 'core/notices' ).removeNotice(notificationId);
+        console.log("param is set");
     }
 }
 function lockPost() {
