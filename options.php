@@ -42,11 +42,11 @@ function publish_validation_admin_init(){
 
     /** error messages */
     add_settings_section('errormsg_settings_section', '<div alt="f105" class="dashicons-before dashicons-warning">Error Messages</div>', 'errormsg_settings_section_output', 'publish_validation');
-    add_settings_field('PV_title_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_title_error_msg','Missing Title Error Msg']);  
-    add_settings_field('PV_excerpt_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_excerpt_error_msg','Missing Excerpt Error Msg']); 
-    add_settings_field('PV_category_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_category_error_msg','Missing Category Error Msg']); 
-    add_settings_field('PV_tag_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_tag_error_msg','Missing Tag Error Msg']); 
-    add_settings_field('PV_featured_img_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_featured_image_error_msg','Missing Featured Image Error Msg']); 
+    add_settings_field('PV_title_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_title_error_msg','Missing Title Error Msg','Title is required']);  
+    add_settings_field('PV_excerpt_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_excerpt_error_msg','Missing Excerpt Error Msg','Excerpt is required']); 
+    add_settings_field('PV_category_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_category_error_msg','Missing Category Error Msg','Category is required']); 
+    add_settings_field('PV_tag_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_tag_error_msg','Missing Tag Error Msg','Tag is required']); 
+    add_settings_field('PV_featured_img_error_msg', '', 'PV_options_render_input', 'publish_validation','errormsg_settings_section',[$options,'PV_featured_image_error_msg','Missing Featured Image Error Msg','Featured image is required']); 
 }
 
 add_action('admin_init', 'publish_validation_admin_init');
@@ -67,7 +67,7 @@ function PV_options_render_chkbx($args) {
     echo "<label for='$args[1]'>$args[2]</label>";
 }
 function PV_options_render_input($args) {
-    $errormsg = isset($args[0][$args[1]]) ? $args[0][$args[1]] : '';
+    $errormsg = isset($args[0][$args[1]]) ? $args[0][$args[1]] : $args[3];
     echo "<label for='$args[1]'>$args[2]</label>";
     echo "<p><input type='text' size='40' id='$args[1]' name='PV_options[$args[1]]' value='$errormsg' ></p>";
 }

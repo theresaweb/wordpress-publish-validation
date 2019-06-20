@@ -28,7 +28,7 @@ function PV_deactivated()
 	delete_option( 'PV_options' );
 }
 
- function publish_validation_register( ) {
+function publish_validation_register( ) {
 	wp_register_script( 'publish-validation-js', plugins_url( 'js/publish-validation.js', __FILE__ ), ['wp-blocks','wp-editor'], 1.0, false );
 	function publish_validation_script_enqueue() {
 		$PV_options = get_option('PV_options');
@@ -40,13 +40,14 @@ function PV_deactivated()
 add_action( 'init', 'publish_validation_register' );
 
 
+
 function classic_editor_validation_register( ) {
-	wp_register_script( 'classic-editor-validation-js', plugins_url( 'js/classic-editor-validation.js', __FILE__ ), ['wp-editor'], 1.0, false );
+	//wp_register_script( 'classic-editor-validation-js', plugins_url( 'js/classic-editor-validation.js', __FILE__ ), ['wp-blocks','wp-editor'], 1.0, false );
 	function classic_editor_validation_script_enqueue() {
 		$PV_options = get_option('PV_options');
 		wp_localize_script( 'classic-editor-validation-js', 'PV_options', $PV_options);
 		wp_enqueue_script( 'classic-editor-validation-js' );
 	}
-	add_action( 'admin_enqueue_scripts', 'classic_editor_validation_script_enqueue' );
+	//add_action( 'admin_enqueue_scripts', 'classic_editor_validation_script_enqueue' );
 }
-add_action( 'mce_external_plugins', 'classic_editor_validation_register' );
+//add_action( 'mce_external_plugins', 'classic_editor_validation_register' ); 
