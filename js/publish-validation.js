@@ -29,9 +29,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
         console.log("after 500 ");
         console.log(PV_options);
 
-
-
-                //Error Messages
+        //Error Messages
         const missingCategoryMsg = PV_options.PV_category_error_msg;
         const missingExcerptMsg = PV_options.PV_excerpt_error_msg;
         const missingThumbnailMsg = PV_options.PV_featured_img_error_msg;
@@ -53,61 +51,67 @@ document.addEventListener( 'DOMContentLoaded', function () {
         const pageDraftShouldHonorRequiredFields = PV_options.PV_for_page_draft==='on' ? true : false;
 
         let title = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' );
+        let content = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'content' );
         let categories = wp.data.select('core/editor').getEditedPostAttribute('categories');
         let excerpt = wp.data.select('core/editor').getEditedPostAttribute('excerpt');
 
         let count = 0;
-        const notices = ['LOCK_NOTICE_TITLE','LOCK_NOTICE_CATEGORY','LOCK_NOTICE_EXCERPT','LOCK_NOTICE_FEATIMG','LOCK_NOTICE_TAG'];
-        //Hide messages on load of new post
-        notices.forEach(function(notice) {
-            wp.data.dispatch( 'core/notices' ).removeNotice( notice );
-            console.log("notice "+notice);
-        })
-
-        wp.data.subscribe( function() {
-            console.log("title--------------- "+title);
-            let postType = wp.data.select( 'core/editor' ).getEditedPostAttribute('type');
-            let postStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
-
-            if ((postStatus === 'draft' && postType === 'post' && !postDraftShouldHonorRequiredFields) || (postStatus === 'draft' && postType === 'page' && !pageDraftShouldHonorRequiredFields) || (postType === 'post' && !postsHaveRequiredFields) || (postType === 'page' && !pagesHaveRequiredFields)) {
-                // don't bother in these cases
-                console.log("don't bother");
-            } else {
-                //title
-                const checkTitle = postTitleIsRequired || titleIsReqOnPage;
-                let newTitle = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' );
-                var titleChanged = newTitle !== title;
-                title = newTitle;
-                if (checkTitle && titleChanged) {
-                    showHideNotification(title, 'LOCK_NOTICE_TITLE', PV_options.PV_title_error_msg);
+        //const notices = ['LOCK_NOTICE_TITLE','LOCK_NOTICE_CATEGORY','LOCK_NOTICE_EXCERPT','LOCK_NOTICE_FEATIMG','LOCK_NOTICE_TAG'];
+        let postType = wp.data.select( 'core/editor' ).getEditedPostAttribute('type');
+        if ((postType === 'post' && postsHaveRequiredFields) || (postType === 'page' && pagesHaveRequiredFields)) {
+            wp.data.subscribe( function() {
+                
+                let postStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+    
+                if ((postStatus === 'draft' && postType === 'post' && !postDraftShouldHonorRequiredFields) || (postStatus === 'draft' && postType === 'page' && !pageDraftShouldHonorRequiredFields)) {
+                    // don't bother in these cases
+                    console.log("don't bother");
+                } else {
+                    //override post locking system that allows content without title
+                    const checkContent = true;
+                    let newContent = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'content' );
+                    var contentChanged = newContent !== content;
+                    content = newContent;
+                    if (contentChanged && title === '') {
+                        showHideNotification(title, 'LOCK_NOTICE_TITLE', PV_options.PV_title_error_msg);
+                    }
+                    //title
+                    const checkTitle = postTitleIsRequired || titleIsReqOnPage;
+                    let newTitle = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' );
+                    var titleChanged = newTitle !== title;
+                    title = newTitle;
+                    if (checkTitle && titleChanged) {
+                        showHideNotification(title, 'LOCK_NOTICE_TITLE', PV_options.PV_title_error_msg);
+                    }
+                    //category
+            /*         const checkCats = postCatIsRequired;
+                    if (categories) { console.log("categories[0] "+categories[0]); }
+                    let newCats = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'categories' );
+                    if (newCats) { console.log("newCats[0] "+newCats[0]); }
+                    var catsChanged = !(_.isEqual(newCats, categories));
+                    //var catsChanged = JSON.stringify(newCats) !== JSON.stringify(categories);
+                    console.log("catsChanged "+catsChanged);
+                    console.log("checkCats "+checkCats);
+                    categories = newCats;
+                    if (categories) { console.log("changedcategories[0] "+categories[0]); }
+                    if (checkCats && catsChanged) {
+                        console.log("cats----------------------------here");
+                        showHideNotification(categories, 'LOCK_NOTICE_CATEGORY', PV_options.PV_category_error_msg);
+                    } */
+                    //excerpt
+                    const checkExcerpt = postExcerptIsRequired;
+                    let newExcerpt = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'excerpt' );
+                    let excerptChanged = newExcerpt !== excerpt;
+                    excerpt = newExcerpt;
+                    if (checkExcerpt && excerptChanged) {
+                        showHideNotification(excerpt, 'LOCK_NOTICE_EXCERPT', PV_options.PV_excerpt_error_msg);
+                    }         
                 }
-                //category
-        /*         const checkCats = postCatIsRequired;
-                if (categories) { console.log("categories[0] "+categories[0]); }
-                let newCats = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'categories' );
-                if (newCats) { console.log("newCats[0] "+newCats[0]); }
-                var catsChanged = !(_.isEqual(newCats, categories));
-                //var catsChanged = JSON.stringify(newCats) !== JSON.stringify(categories);
-                console.log("catsChanged "+catsChanged);
-                console.log("checkCats "+checkCats);
-                categories = newCats;
-                if (categories) { console.log("changedcategories[0] "+categories[0]); }
-                if (checkCats && catsChanged) {
-                    console.log("cats----------------------------here");
-                    showHideNotification(categories, 'LOCK_NOTICE_CATEGORY', PV_options.PV_category_error_msg);
-                } */
-                //excerpt
-                const checkExcerpt = postExcerptIsRequired;
-                let newExcerpt = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'excerpt' );
-                let excerptChanged = newExcerpt !== excerpt;
-                excerpt = newExcerpt;
-                if (checkExcerpt && excerptChanged) {
-                    showHideNotification(excerpt, 'LOCK_NOTICE_EXCERPT', PV_options.PV_excerpt_error_msg);
-                }         
-            }
-            console.log('tick'+count);
-            count ++;
-        });
+                console.log('tick'+count);
+                count ++;
+            });
+        }
+
 
 
 
