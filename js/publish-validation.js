@@ -52,7 +52,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
         let title = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'title' );
         let content = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'content' );
-        let categories = wp.data.select('core/editor').getEditedPostAttribute('categories');
+        let categoriesLength = Object.keys(wp.data.select('core/editor').getEditedPostAttribute('categories')).length;
         let excerpt = wp.data.select('core/editor').getEditedPostAttribute('excerpt');
 
         let count = 0;
@@ -73,7 +73,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
                     var contentChanged = newContent !== content;
                     content = newContent;
                     if (contentChanged && title === '') {
-                        showHideNotification(title, 'LOCK_NOTICE_TITLE', PV_options.PV_title_error_msg);
+                        showHideNotification(title, 'LOCK_NOTICE_TITLE', missingTitleMsg);
                     }
                     //title
                     const checkTitle = postTitleIsRequired || titleIsReqOnPage;
@@ -81,31 +81,24 @@ document.addEventListener( 'DOMContentLoaded', function () {
                     var titleChanged = newTitle !== title;
                     title = newTitle;
                     if (checkTitle && titleChanged) {
-                        showHideNotification(title, 'LOCK_NOTICE_TITLE', PV_options.PV_title_error_msg);
+                        showHideNotification(title, 'LOCK_NOTICE_TITLE', missingTitleMsg);
                     }
-                    //category
-            /*         const checkCats = postCatIsRequired;
-                    if (categories) { console.log("categories[0] "+categories[0]); }
-                    let newCats = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'categories' );
-                    if (newCats) { console.log("newCats[0] "+newCats[0]); }
-                    var catsChanged = !(_.isEqual(newCats, categories));
-                    //var catsChanged = JSON.stringify(newCats) !== JSON.stringify(categories);
-                    console.log("catsChanged "+catsChanged);
-                    console.log("checkCats "+checkCats);
-                    categories = newCats;
-                    if (categories) { console.log("changedcategories[0] "+categories[0]); }
-                    if (checkCats && catsChanged) {
-                        console.log("cats----------------------------here");
-                        showHideNotification(categories, 'LOCK_NOTICE_CATEGORY', PV_options.PV_category_error_msg);
-                    } */
                     //excerpt
                     const checkExcerpt = postExcerptIsRequired;
                     let newExcerpt = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'excerpt' );
                     let excerptChanged = newExcerpt !== excerpt;
                     excerpt = newExcerpt;
                     if (checkExcerpt && excerptChanged) {
-                        showHideNotification(excerpt, 'LOCK_NOTICE_EXCERPT', PV_options.PV_excerpt_error_msg);
-                    }         
+                        showHideNotification(excerpt, 'LOCK_NOTICE_EXCERPT', missingExcerptMsg);
+                    }
+                    const checkCategory = postCatIsRequired;
+                    let newCategoriesLength = Object.keys(wp.data.select('core/editor').getEditedPostAttribute('categories')).length;
+                    let categoryChanged = newCategoriesLength !== categoriesLength;
+                    categoriesLength = newCategoriesLength;
+                    if (checkCategory && categoryChanged) {
+                        showHideNotification(categoriesLength === 0 ? '' : categoriesLength, 'LOCK_NOTICE_CATEGORY', missingCategoryMsg);
+                    }
+
                 }
                 console.log('tick'+count);
                 count ++;
