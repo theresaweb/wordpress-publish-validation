@@ -24,7 +24,7 @@ function removeError( errorId ) {
 document.addEventListener( 'DOMContentLoaded', function () {
     console.log("content loaded");
     console.log(PV_options);
-    window.setTimeout(function() {
+     window.setTimeout(function() {
         console.log("after 500 ");
         console.log(PV_options);
 
@@ -33,7 +33,7 @@ document.addEventListener( 'DOMContentLoaded', function () {
         const missingExcerptMsg = PV_options.PV_excerpt_error_msg;
         const missingThumbnailMsg = PV_options.PV_featured_image_error_msg;
         const missingTagMsg = PV_options.PV_tag_error_msg;
-        const missingTitleMsg = PV_options.PV_title_error_msg;
+        let missingTitleMsg = PV_options.PV_title_error_msg;
         //Required fields
         const postTitleIsRequired = PV_options.PV_title_req_post==='on' ? true : false;
         const postCatIsRequired = PV_options.PV_category_req_post==='on' ? true : false;
@@ -53,8 +53,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
         let content = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'content' );
         let featuredImage = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
 
-        let categoriesLength = Object.keys(wp.data.select('core/editor').getEditedPostAttribute('categories')).length;
-        let tagsLength = Object.keys(wp.data.select('core/editor').getEditedPostAttribute('tags')).length;
+        let categoriesLength = wp.data.select('core/editor').getEditedPostAttribute('categories') ? Object.keys(wp.data.select('core/editor').getEditedPostAttribute('categories')).length : 0;
+        let tagsLength = wp.data.select('core/editor').getEditedPostAttribute('tags') ? Object.keys(wp.data.select('core/editor').getEditedPostAttribute('tags')).length: 0;
         let excerpt = wp.data.select('core/editor').getEditedPostAttribute('excerpt');
 
         let count = 0;
@@ -64,8 +64,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
             wp.data.subscribe( function() {
                 
                 let postStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
-    
-                if ((postStatus === 'draft' && postType === 'post' && !postDraftShouldHonorRequiredFields) || (postStatus === 'draft' && postType === 'page' && !pageDraftShouldHonorRequiredFields)) {
+                console.log(postType);
+                if ((postStatus === 'draft')  && ((postType === 'post' && !postDraftShouldHonorRequiredFields) || (postType === 'page' && !pageDraftShouldHonorRequiredFields))) {
                     // don't bother in these cases
                     console.log("don't bother");
                 } else {
@@ -75,6 +75,9 @@ document.addEventListener( 'DOMContentLoaded', function () {
                     var contentChanged = newContent !== content;
                     content = newContent;
                     if (contentChanged && title === '') {
+                        if ((postType === 'post' && !postDraftShouldHonorRequiredFields) || (postType === 'page' && !pageDraftShouldHonorRequiredFields)) {
+                            missingTitleMsg = 'Title is required except on draft';
+                        }
                         showHideNotification(title, 'LOCK_NOTICE_TITLE', missingTitleMsg);
                     }
                     //title
@@ -125,5 +128,5 @@ document.addEventListener( 'DOMContentLoaded', function () {
             });
         }
 
-      }, 500);
+      }, 500); 
 });
